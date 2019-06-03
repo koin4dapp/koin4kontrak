@@ -12,4 +12,4 @@ Value sharing is come from percentage of surplus or deficit in each game session
 
 Koin DApp   -   Founder
 
-visit us: https://koin4meetone.appspot.com
+visit us: koin4dapp.appspot.com
