@@ -16,7 +16,7 @@ public:
         char *tx = (char *)malloc(s);
         read_transaction(tx, s);
         capi_checksum256 result; //32bytes of 8 chunks of uint_32
-        sha256(tx,s, &result); //user position seed
+        sha256(tx,s, &result); //player action seed
 
         seed = result.hash[7];
         seed <<= 8;
