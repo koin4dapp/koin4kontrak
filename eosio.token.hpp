@@ -280,7 +280,7 @@ namespace eosio {
             uint64_t lastseed;
          };
          
-         typedef eosio::singleton <"rseed"_n,seed> rseed;
+         typedef eosio::singleton <"secretseed"_n,seed> secretseed;
 
          void sub_balance( name owner, asset value );
          void add_balance( name owner, asset value, name ram_payer );
@@ -352,7 +352,7 @@ namespace eosio {
          
          //singletone setter/getter for last session seed
          uint64_t get_lastseed() {
-           rseed savedseed(_self,_self.value);
+           secretseed savedseed(_self,_self.value);
            auto result = savedseed.get_or_create(_self, seed{now()});
            
 #if !MAINNET
@@ -363,7 +363,7 @@ namespace eosio {
          }
          
          void set_nextseed( uint64_t lastseed ) {
-           rseed savedseed(_self, _self.value);
+           secretseed savedseed(_self, _self.value);
            savedseed.set(seed{lastseed}, _self);
          }
    };
