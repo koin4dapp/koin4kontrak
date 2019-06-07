@@ -2,20 +2,6 @@
 #include <eosiolib/transaction.h>
 #include <string>
 
-std::string xto_string(uint64_t number)
-{
-  char str[21];
-  char* pos = str;
-  pos += sizeof(str);
-  *pos = 0;
-  do {
-    pos--;
-    *pos = (number%10)+'0';
-    number /= 10;
-  } while (number > 0);
-  return {pos};
-}
-
 class random {
 private:
     uint64_t seed;
@@ -25,12 +11,12 @@ public:
 
     uint8_t rolls[6] = {0,0,0,0,0,0};
 
-    void init(uint64_t initseed) {
+    void init(uint64_t initseed) { //initseed = previous session seed + user seed
         auto s = read_transaction(nullptr,0);
         char *tx = (char *)malloc(s);
         read_transaction(tx, s);
         capi_checksum256 result; //32bytes of 8 chunks of uint_32
-        sha256(tx,s, &result);
+        sha256(tx,s, &result); //blockchain seed
 
         seed = result.hash[7];
         seed <<= 8;
@@ -158,17 +144,18 @@ public:
       return result;
     }
     
+    //expected value = 1x20+2x10+3x6+4x5+10x2=20+20+18+20+20=98
     int wheelcarlo(uint32_t rnd_1_100) {
-        if (rnd_1_100 < 81) //odds 52%
+        if (rnd_1_100 < 81)
           return 0;      
         if (rnd_1_100 < 90)
-          return 2;
+          return 2;   //10x2=20
         if (rnd_1_100 < 94)
-          return 5;
+          return 5;   //4x5=20
         if (rnd_1_100 < 97)
-          return 6;
+          return 6;   //3x6=18
         if (rnd_1_100 < 99)
-          return 10;
-        return 20;
+          return 10;  //2x10=20
+        return 20;    //1x20=20
     }
 };
