@@ -6,6 +6,7 @@
 
 #include <eosiolib/asset.hpp>
 #include <eosiolib/eosio.hpp>
+#include <eosiolib/singleton.hpp>
 #include <string>
 #include <math.h>
 #include <random.hpp>
@@ -274,6 +275,12 @@ namespace eosio {
          typedef eosio::multi_index< "sevents"_n, sport_event > sevents;
          typedef eosio::multi_index< "sports"_n, sport > sports;
          
+         //singletone for save last session seed
+         struct seed {
+            uint64_t lastseed;
+         };
+         
+         typedef eosio::singleton <"rseed"_n,seed> rseed;
 
          void sub_balance( name owner, asset value );
          void add_balance( name owner, asset value, name ram_payer );
@@ -341,6 +348,23 @@ namespace eosio {
              number /=10;
            }
            return result;
+         }
+         
+         //singletone setter/getter for last session seed
+         uint64_t get_lastseed() {
+           rseed savedseed(_self,_self.value);
+           auto result = savedseed.get_or_create(_self, seed{now()});
+           
+#if !MAINNET
+    eosio::print("last session seed:",result.lastseed);
+#endif              
+           
+           return result.lastseed;
+         }
+         
+         void set_nextseed( uint64_t lastseed ) {
+           rseed savedseed(_self, _self.value);
+           savedseed.set(seed{lastseed}, _self);
          }
    };
 
