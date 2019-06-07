@@ -11,12 +11,12 @@ public:
 
     uint8_t rolls[6] = {0,0,0,0,0,0};
 
-    void init(uint64_t initseed) { //initseed = previous session seed + user seed
+    void init(uint64_t initseed) { //initseed = previous session seed
         auto s = read_transaction(nullptr,0);
         char *tx = (char *)malloc(s);
         read_transaction(tx, s);
         capi_checksum256 result; //32bytes of 8 chunks of uint_32
-        sha256(tx,s, &result); //blockchain seed
+        sha256(tx,s, &result); //user position seed
 
         seed = result.hash[7];
         seed <<= 8;
@@ -33,7 +33,7 @@ public:
         seed ^= result.hash[1];
         seed <<= 8;
         seed ^= result.hash[0];
-        seed ^= initseed;
+        seed ^= seed ^= (initseed^(tapos_block_prefix()*tapos_block_num())); //blockchain seed
         
         balls = "0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWMXY[\\";
         
