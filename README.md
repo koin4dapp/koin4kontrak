@@ -15,7 +15,7 @@ Koin DApp   -   Founder
 visit us: koin4dapp.appspot.com
 
 <h1>3 Seeds Random Number Generator (3SRNG)</h1>
-Our decentralized random number generators(DRNG) bring fairness and tamper-resistance in the process of generating numbers to ensure fair game to all members. To Ensure the fairness our DRNG using 3 random number seeds. The first seed is generated from player transaction to DApp, the second one is from previous session seed saved at DApp, and the third is from the blockchain it self. So there are no Founder intervention, all is happened automatically at the blockchain based on DApp algorithm. Code snippet:
+Our decentralized random number generators(DRNG) bring fairness and tamper-resistance in the process of generating numbers to ensure fair game to all members. To Ensure the fairness our DRNG using 3 random number seeds. The first seed is generated from player transaction to DApp, the second one is from previous session seed saved at DApp, and the third is from the blockchain it self. So there are no Founder intervention, and all is happened automatically at the blockchain based on DApp algorithm. The code snippet:
 
 ```
 void init(uint64_t initseed) { //second seed=last session seed
@@ -59,7 +59,7 @@ __attribute__((eosio_wasm_import))
 size_t read_transaction(char *buffer, size_t size);
 ```
 
-Information about (tapos_block_prefix()*tapos_block_num() which we use as second seed(blockchain seed) can be read at eosio transaction.h
+Information about (tapos_block_prefix()*tapos_block_num()) which we use as second seed(blockchain seed) can be read at eosio transaction.h
 
 ```
   /**
@@ -125,7 +125,7 @@ uint32_t rand(uint32_t to) { //generate random 1 - to range
 ```
 
 <h3>Possibility of Attack</h3>
-KOIN token is player to player community DApp, so that we must make sure that 3SDRNG is secure from attacker can cause loss to all KOIN token holder. The key of target attack is in the 3 seeds. Actually there are no way to attack 3SDRNG from outside the blockchain using RPC API call.
+KOIN token is player to player community DApp, so that we must make sure that 3SDRNG is secure from the attacker can cause loss to all KOIN token holder. The key of target attack is in the three seeds. Actually there are no way to attack 3SDRNG from outside the blockchain using RPC API call.
 
 The advanced attackers can try to make smart contract in order to attack our DApp. Their smart contract will can calculate our blockchain seed using tapos_block_prefix() and tapos_block_num(), but must make sure that the time between the attacker smart contract and transaction initialed by the smart contract must be run on the same block, otherwise the two numbers will be changed and the result is different. The code snipped:
 
@@ -142,7 +142,7 @@ action(
 
 (Source: https://bzdww.com/article/130403/, last access 8 June 2019)
 
-Attack to our session seed is possible even though the table are not added to the ABI file, but advanced attacker can write smart contract to read it directly from the blockchain. They would typically create a struct and typedef similar to our singletone table, and read it using their smart contract. The code snipped:
+Attack to our session seed is possible even though the table are not added to the ABI file, but advanced attacker can write a smart contract to read it directly from the blockchain. They would typically create a struct and typedef similar to our singleton table and read it using their smart contract. The code snipped:
 
 ```
 struct similarobj {
@@ -157,7 +157,7 @@ auto seed2 = db.get();
 
 ```
 
-Until now I don't found any reference from the web about how to get transaction ID before pushing transaction to blockchain, The transaction ID is the sha256 of the transaction structure in memory (see. read_transaction(tx, s)).
+Until now I haven't found any reference from the web about how to get transaction ID before pushing transaction to blockchain, The transaction ID is the sha256 of the transaction structure in memory (see. read_transaction(tx, s)).
 
 <h3>Conclusion</h3>
-So far, we can made conclusion that our 3SDRNG is secure and ensure fairness to all members. If they have possibility to attack our DApp, but they are hard to do in smart contract.
+So far, we can make conclusion that our 3SDRNG is secure and ensure fairness to all members. If there are possible to attack our DApp, but they are hard to do in the smart contract and must make sure that run on the same block.
