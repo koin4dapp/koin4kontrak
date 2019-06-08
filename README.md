@@ -140,7 +140,7 @@ action(
 
 (Source: https://bzdww.com/article/130403/, last access 8 June 2019)
 
-Attack to session seed is possible even though the table are not added to the abi file, but advanced attacker can write smart contract to read it directly from the blockchain. They would typically create a struct and typedef similar to our table structure, and read it using our table code and scope, the code snipped:
+Attack to session seed is possible even though the table are not added to the abi file, but advanced attacker can write smart contract to read it directly from the blockchain. They would typically create a struct and typedef similar to our table structure, and read it using our code and scope name, the code snipped:
 
 ```
 struct similarobj {
@@ -149,7 +149,7 @@ struct similarobj {
 
 typedef eosio::singleton <"targetobj"_n,similarobj> targetobj;
 
-auto db = targetobj(targetcode,targetscope);
+auto db = targetobj("targetcode"_n,name("targetscope").value);
 auto seed2 = db.get();
 ...
 
