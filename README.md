@@ -155,3 +155,7 @@ auto seed2 = db.get();
 
 ```
 
+Until now I don't found any reference about how to get transaction ID before pushing transaction to blockchain, The transaction ID is the sha256 of the transaction structure in memory. So our 3SDRNG depend on the First seed.
+
+<h3>Conclusion</h3>
+So until now, I can made conclusion that our 3SDRNG is secure and ensure fairness to all members.
