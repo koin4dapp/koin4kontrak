@@ -23,7 +23,7 @@ void init(uint64_t initseed) { //second seed=last session seed
   char *tx = (char *)malloc(s);
   read_transaction(tx, s);
   capi_checksum256 result; //32bytes of 8 chunks of uint_32
-  sha256(tx,s, &result); //First seed=player seed=transactionid, fairness to player
+  sha256(tx,s, &result); //First seed=player seed=transaction ID, fairness to player
 
   seed = result.hash[7];
   seed <<= 8;
@@ -154,10 +154,18 @@ typedef eosio::singleton <"targetobj"_n,similarobj> targetobj;
 auto db = targetobj("targetcode"_n,name("targetscope").value);
 auto seed2 = db.get();
 ...
-
 ```
 
-Until now I haven't found any reference from the web about how to get transaction ID before pushing transaction to blockchain, The transaction ID is the sha256 of the transaction structure in memory (see. read_transaction(tx, s)).
+Until now I haven't found any reference from the web about how to get transaction ID before pushing transaction to blockchain, The transaction ID is the sha256 of the transaction structure in memory (see. read_transaction(tx, s)). The code snipped:
 
+```
+auto s = read_transaction(nullptr,0);
+char *tx = (char *)malloc(s);
+read_transaction(tx, s);
+capi_checksum256 result; //32bytes of 8 chunks of uint_32
+sha256(tx,s, &result);
+printhex(&result, sizeof(result)); //please compare to transaction ID
+```
+  
 <h3>Conclusion</h3>
 So far, we can make conclusion that our 3SDRNG is secure and ensure fairness to all members. If there are possible to attack our DApp, but they are hard to do in the smart contract and must make sure that run on the same block.
