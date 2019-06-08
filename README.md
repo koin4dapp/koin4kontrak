@@ -162,9 +162,10 @@ Until now I haven't found any reference from the web about how to get transactio
 auto s = read_transaction(nullptr,0);
 char *tx = (char *)malloc(s);
 read_transaction(tx, s);
+printhex(tx,s); //packed_trx
 capi_checksum256 result; //32bytes of 8 chunks of uint_32
 sha256(tx,s, &result);
-printhex(&result, sizeof(result)); //please compare to transaction ID
+printhex(&result, sizeof(result)); //transaction ID
 ```
   
 <h3>Conclusion</h3>
