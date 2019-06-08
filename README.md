@@ -125,7 +125,9 @@ uint32_t rand(uint32_t to) { //generate random 1 - to range
 ```
 
 <h3>Possibility of Attack</h3>
-The key of potential attack is in the 3 seeds. There are no way to attack outside the blockchain, but advanced attacker can make their own smart contract run on the blockchain to get tapos_block_prefix() and tapos_block_num() and must make sure that the time between the attacker smart contract and transaction initial by the smart contract must be run the same block, otherwise the two numbers will be changed and the result is different. But remember in game like dice, free dice dan lucky wheel result are based on value range (<50 or >51), so there are still have chance to attack. Code snipped to initial action to run transaction on our DApp from attacker smart contract:
+KOIN token is player to player community DApp, so that we must make sure that 3SDRNG is secure from attacker can cause loss to all KOIN token holder. The key of target attack is in the 3 seeds. Actually there are no way to attack 3SDRNG from outside the blockchain using RPC API call.
+
+The advanced attackers can try to make smart contract in order to attack our DApp. Their smart contract will can calculate our blockchain seed using tapos_block_prefix() and tapos_block_num(), but must make sure that the time between the attacker smart contract and transaction initialed by the smart contract must be run on the same block, otherwise the two numbers will be changed and the result is different. The code snipped:
 
 ```
 auto seed3 = tapos_block_prefix() * tapos_block_num();
@@ -140,7 +142,7 @@ action(
 
 (Source: https://bzdww.com/article/130403/, last access 8 June 2019)
 
-Attack to session seed is possible even though the table are not added to the abi file, but advanced attacker can write smart contract to read it directly from the blockchain. They would typically create a struct and typedef similar to our table structure, and read it using our code and scope name, the code snipped:
+Attack to our session seed is possible even though the table are not added to the ABI file, but advanced attacker can write smart contract to read it directly from the blockchain. They would typically create a struct and typedef similar to our singletone table, and read it using their smart contract. The code snipped:
 
 ```
 struct similarobj {
@@ -155,7 +157,7 @@ auto seed2 = db.get();
 
 ```
 
-Until now I don't found any reference about how to get transaction ID before pushing transaction to blockchain, The transaction ID is the sha256 of the transaction structure in memory. So our 3SDRNG depend on the First seed.
+Until now I don't found any reference from the web about how to get transaction ID before pushing transaction to blockchain, The transaction ID is the sha256 of the transaction structure in memory (see. read_transaction(tx, s)).
 
 <h3>Conclusion</h3>
-So until now, I can made conclusion that our 3SDRNG is secure and ensure fairness to all members.
+So far, we can made conclusion that our 3SDRNG is secure and ensure fairness to all members. If they have possibility to attack our DApp, but they are hard to do in smart contract.
