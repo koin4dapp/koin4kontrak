@@ -151,8 +151,110 @@ capi_checksum256 result; //32bytes of 8 chunks of uint_32
 sha256(tx,s, &result);
 printhex(&result, sizeof(result)); //transaction ID
 ```
-a
+Transaction structure in JSON can be view using /v1/history/get_transaction RPC API Call with the code snipped is:
 
+```
+<html>
+<script>
+var data = "{\"id\":\"cd4c133d3d5d4dd442e24d64acf820e9dcc8369842b94c133dd1e51098e00d5c\"}";
+
+var xhr = new XMLHttpRequest();
+
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
+});
+
+xhr.open("POST", "https://api.bossweden.org/v1/history/get_transaction");
+xhr.setRequestHeader("accept", "application/json");
+xhr.setRequestHeader("content-type", "application/json");
+
+xhr.send(data);
+</script>
+</html>
+```
+And the JSON result focus on trx node is:
+```
+{
+  "expiration": "2019-06-07T08:38:14",
+  "ref_block_num": 13583,
+  "ref_block_prefix": 3561610408,
+  "max_net_usage_words": 0,
+  "max_cpu_usage_ms": 0,
+  "delay_sec": 0,
+  "context_free_actions": [
+    
+  ],
+  "actions": [
+    {
+      "account": "koin4kontrak",
+      "name": "playwheel",
+      "authorization": [
+        {
+          "actor": "klyzliyucouo",
+          "permission": "active"
+        }
+      ],
+      "data": {
+        "player": "klyzliyucouo",
+        "quantity": "1.0000 KOIN"
+      },
+      "hex_data": "403545dabbf87d841027000000000000044b4f494e000000"
+    }
+  ],
+  "transaction_extensions": [
+    
+  ],
+  "signatures": [
+    "SIG_K1_K1UQWEGJn7wrbUQZP4ga5y2k42u8sxRpx1RU2L9Qgvn4S7FM6X75gF9aAATSDVh4DiyYUWE9gtqzrJcrQoRaKYpez6ih3A"
+  ],
+  "context_free_data": [
+    
+  ]
+}
+```
+Attacker can get ref_block_num and ref_block_prefix using  /v1/chain/get_info RPC API Call with the code snipped is:
+
+```
+<html>
+<script>
+var data = null;
+
+var xhr = new XMLHttpRequest();
+
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
+});
+
+xhr.open("POST", "https://api.bossweden.org/v1/chain/get_info");
+xhr.setRequestHeader("accept", "application/json");
+xhr.setRequestHeader("content-type", "application/json");
+
+xhr.send(data);
+</script>
+</html>
+```
+Where ref_block_num = last_irreversible_block_num, ref_block_prefix = head_block_num.
+```
+{
+  "server_version": "de643ec0",
+  "chain_id": "d5a3d18fbb3c084e3b1f3fa98c21014b5f3db536cc15d08f9f6479517c6a3d86",
+  "head_block_num": 24537585,
+  "last_irreversible_block_num": 24537255,
+  "last_irreversible_block_id": "017668a79c7f887b45b59fca389cbcb14f3f7afb0fa5d09ac4ac1a1b91b13e83",
+  "head_block_id": "017669f10670ff45e9a99212f7e2cb090c418d00eea41fecfe4fd37318484c2a",
+  "head_block_time": "2019-06-08T13:45:44.500",
+  "head_block_producer": "bosswedenorg",
+  "virtual_block_cpu_limit": 200000000,
+  "virtual_block_net_limit": 1048576000,
+  "block_cpu_limit": 199900,
+  "block_net_limit": 1048576,
+  "server_version_string": "v2.0.3"
+}
+```
 
 To attack tapos_block_prefix() and tapos_block_num(), attacker must make sure that their smart contract and transaction initialize to our DAPP are run on the same block, otherwise the two numbers will be changed and the result is different. The code snipped to get tapos_block_prefix() and tapos_block_num(), then initialize action to our DAPP is:
 
@@ -169,7 +271,5 @@ action(
 
 (Source: https://bzdww.com/article/130403/, last access 8 June 2019)
 
-
-  
 <h3>Conclusion</h3>
 So far, we can make conclusion that our 3SDRNG is secure and ensure fairness to all members. If there are possible to attack our DApp, but they are hard to do in the smart contract and must make sure that run on the same block.
