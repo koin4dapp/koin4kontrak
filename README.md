@@ -15,15 +15,15 @@ Koin DApp   -   Founder
 visit us: koin4dapp.appspot.com
 
 <h1>3 Seeds Random Number Generator (3SRNG)</h1>
-Our decentralized random number generators(DRNG) bring fairness and tamper-resistance in the process of generating numbers to ensure fair game to all members. To Ensure the fairness our DRNG using 3 random number seeds. The first seed is generated from player transaction to DApp, the second one is from previous session seed saved at DApp, and the third is from the blockchain it self. So there are no Founder intervention, and all is happened automatically at the blockchain based on DApp algorithm. The code snippet:
+Our decentralized random number generators(DRNG) bring fairness and tamper-resistance in the process of generating numbers to ensure fair game to all members. To Ensure the fairness our DRNG using 3 random number seeds. The first seed is from previous session seed saved at our DApp, the second seed is generated from current transaction ID, and the third seed is currently executing transaction block number. So there are no Founder intervention, and all is happened automatically at the blockchain based on DApp algorithm. The code snippet:
 
 ```
-void init(uint64_t initseed) { //second seed=last session seed
+void init(uint64_t initseed) { //first seed=previous session seed saved at DApp
   auto s = read_transaction(nullptr,0);
   char *tx = (char *)malloc(s);
   read_transaction(tx, s);
-  capi_checksum256 result; //32bytes of 8 chunks of uint_32
-  sha256(tx,s, &result); //First seed=player seed=transaction ID, fairness to player
+  capi_checksum256 result;
+  sha256(tx,s, &result); //second seed=current transaction ID
 
   seed = result.hash[7];
   seed <<= 8;
@@ -40,11 +40,11 @@ void init(uint64_t initseed) { //second seed=last session seed
   seed ^= result.hash[1];
   seed <<= 8;
   seed ^= result.hash[0];
-  seed ^= seed ^= (initseed^(tapos_block_prefix()*tapos_block_num())); //Third seed=blockchain seed=fairness to all members
+  seed ^= seed ^= (initseed^(tapos_block_prefix()*tapos_block_num())); //Third seed=current block number
 }
 ```
 
-Information about read_transaction which we use as first seed(player seed) can be read at eosio transaction.h
+Information about read_transaction can be read at eosio transaction.h
 
 ```
  /**
@@ -59,7 +59,7 @@ __attribute__((eosio_wasm_import))
 size_t read_transaction(char *buffer, size_t size);
 ```
 
-Information about (tapos_block_prefix()*tapos_block_num()) which we use as second seed(blockchain seed) can be read at eosio transaction.h
+Information about tapos_block_prefix() and tapos_block_num() can be read at eosio transaction.h
 
 ```
   /**
@@ -100,7 +100,7 @@ The SHA-256 hash algorithm produces hash values that are hard to predict from th
 ```
 void randraw() { 
   capi_checksum256 result; //32bytes of 8 chunks of uint_32
-  sha256((char *)&seed, sizeof(seed), &result); //distributed samples fairness to all members
+  sha256((char *)&seed, sizeof(seed), &result); //pseudo random namber generator using SHA-256
   seed = result.hash[7];
   seed <<= 8;
   seed ^= result.hash[6];
@@ -125,12 +125,39 @@ uint32_t rand(uint32_t to) { //generate random 1 - to range
 ```
 
 <h3>Possibility of Attack</h3>
-KOIN token is player to player community DApp, so that we must make sure that 3SDRNG is secure from the attacker can cause loss to all KOIN token holder. The key of target attack is in the three seeds. Actually there are no way to attack 3SDRNG from outside the blockchain using RPC API call.
+KOIN token is player to player community DApp, so that we must make sure that 3SDRNG is secure from the attacker can cause loss to all KOIN token holder. The key of target attack is in the three seeds. The basic technique to attack an DApp is using RPC API Call, but this approach will not work on our DApp, because there are no way to read previous session seed table which isn't add to the ABI file, so the attacker must write smart contract to attack our DApp.
 
-The advanced attackers can try to make smart contract in order to attack our DApp. Their smart contract will can calculate our blockchain seed using tapos_block_prefix() and tapos_block_num(), but must make sure that the time between the attacker smart contract and transaction initialed by the smart contract must be run on the same block, otherwise the two numbers will be changed and the result is different. The code snipped:
+To attack our last session seed, attacker would typically create a struct and typedef similar to our singleton table and read it using the same code and scope as our DApp. The code snipped to read from table that are not added to the ABI file is:
 
 ```
-auto seed3 = tapos_block_prefix() * tapos_block_num();
+struct similarobj {
+  ...
+}
+
+typedef eosio::singleton <"targetobj"_n,similarobj> targetobj;
+
+auto db = targetobj("targetcode"_n,name("targetscope").value);
+auto seed1 = db.get();
+...
+```
+To attack transaction Id, attacker must generated packed_trx and convert it to transaction ID using sha256. The code snipped to read current transaction structure from memory and convert to transaction ID:
+
+```
+auto s = read_transaction(nullptr,0);
+char *tx = (char *)malloc(s);
+read_transaction(tx, s);
+printhex(tx,s); //packed_trx
+capi_checksum256 result; //32bytes of 8 chunks of uint_32
+sha256(tx,s, &result);
+printhex(&result, sizeof(result)); //transaction ID
+```
+a
+
+
+To attack tapos_block_prefix() and tapos_block_num(), attacker must make sure that their smart contract and transaction initialize to our DAPP are run on the same block, otherwise the two numbers will be changed and the result is different. The code snipped to get tapos_block_prefix() and tapos_block_num(), then initialize action to our DAPP is:
+
+```
+auto seed2 = tapos_block_prefix() * tapos_block_num();
   ...
   ...
 action(
@@ -142,31 +169,7 @@ action(
 
 (Source: https://bzdww.com/article/130403/, last access 8 June 2019)
 
-Attack to our session seed is possible even though the table are not added to the ABI file, but advanced attacker can write a smart contract to read it directly from the blockchain. They would typically create a struct and typedef similar to our singleton table and read it using their smart contract. The code snipped:
 
-```
-struct similarobj {
-  ...
-}
-
-typedef eosio::singleton <"targetobj"_n,similarobj> targetobj;
-
-auto db = targetobj("targetcode"_n,name("targetscope").value);
-auto seed2 = db.get();
-...
-```
-
-Until now I haven't found any reference from the web about how to get transaction ID before pushing transaction to blockchain, The transaction ID is the sha256 of the transaction structure in memory (see. read_transaction(tx, s)). The code snipped:
-
-```
-auto s = read_transaction(nullptr,0);
-char *tx = (char *)malloc(s);
-read_transaction(tx, s);
-printhex(tx,s); //packed_trx
-capi_checksum256 result; //32bytes of 8 chunks of uint_32
-sha256(tx,s, &result);
-printhex(&result, sizeof(result)); //transaction ID
-```
   
 <h3>Conclusion</h3>
 So far, we can make conclusion that our 3SDRNG is secure and ensure fairness to all members. If there are possible to attack our DApp, but they are hard to do in the smart contract and must make sure that run on the same block.
