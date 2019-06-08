@@ -94,6 +94,7 @@ The SHA-256 hash algorithm produces hash values that are hard to predict from th
 <li>The SH-256 algorithm is public and many implementations are available in many languages.</li>
 <li>Given the seed, anyone can verify that the sequence of numbers generated was correct—that it indeed comes from applying SHA-256</li>
 <li>Unless the seed is known, the sequence of values generated is unpredictable (so the result is hard to "game"). It is very hard to distinguish the output from independent, uniformly distributed samples</li>
+</ul>  
 (Source: P.B. Stark, https://www.stat.berkeley.edu/~stark/Java/Html/sha256Rand.htm, last access 8 June 2019)
 
 ```
