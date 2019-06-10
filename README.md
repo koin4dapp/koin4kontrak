@@ -124,7 +124,7 @@ uint32_t rand(uint32_t to) { //generate random 1 - to range
 }
 ```
 
-<h3>Possibility of Attack</h3>
+<h3>Possibility of 3SDRNG Attack</h3>
 KOIN token is player to player community DApp, so that we must make sure that 3SDRNG is secure from the attacker can cause loss to all KOIN token holder. The key of target attack is in the three seeds. The basic technique to attack an DApp is using RPC API Call, but this approach will not work on our DApp, because there are no way to read previous session seed table which isn't add to the ABI file, so the attacker must write smart contract to attack our DApp.
 
 To attack our last session seed, attacker would typically create a struct and typedef similar to our singleton table and read it using the same code and scope as our DApp. The code snipped to read from table that are not added to the ABI file is:
@@ -244,8 +244,8 @@ action(
 
 (Source: https://bzdww.com/article/130403/, last access 8 June 2019)
 
-<h1>Rollback Attack</h3>
-Another potential attack to game smart contract is Rollback Attact. Attacker can make a smart contract that compare balance before and after action call to play game, then rollback the transaction using eosio_assert if ending balance < begining balance. The code snipped is:
+<h1>Possibility of Rollback Attack</h3>
+In our DApp process we have make sure avoiding Rollback Attack. In rollback attack technique, attacker can make a smart contract that compare balance before and after action to play game, then rollback the transaction using eosio_assert if ending balance < begining balance. The code snipped is:
 
 ```
 void token::checkbalance(asset bbalance)
@@ -285,4 +285,4 @@ void token::smartprofit( asset value)
 ```
 
 <h3>Conclusion</h3>
-So far, we can make conclusion that our 3SDRNG is secure and ensure fairness to all members. If there are possible to attack our DApp, but they are hard to do in the smart contract and must make sure that they run on the same block.
+So far, we can make conclusion that our 3SDRNG and process in our DApp are secure and ensure fairness to all members. If there are possible to attack our DApp, but they are hard to do in the smart contract. Attacker must initial packed_trx similar to in memory packed_trx and must make sure that they run on the same block.
