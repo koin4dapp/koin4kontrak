@@ -126,9 +126,6 @@ namespace eosio {
                         string  memo );
             
          [[eosio::action]]
-         void cashierpay( name to, asset quantity, string memo);
-                        
-         [[eosio::action]]
          void open( name owner );
 
          [[eosio::action]]
@@ -143,6 +140,12 @@ namespace eosio {
          [[eosio::action]]
          void withdraw( name    holder,
                       asset   quantity);
+                      
+         [[eosio::action]]
+         void settle(name to,
+                        asset payback,
+                        string memo
+         );                       
                       
          static asset get_supply( name token_contract_account, symbol_code sym_code )
          {
@@ -275,19 +278,18 @@ namespace eosio {
          typedef eosio::multi_index< "sevents"_n, sport_event > sevents;
          typedef eosio::multi_index< "sports"_n, sport > sports;
          
-         //singletone for save last session seed
+         //singletone for save dapp random seed
          struct seed {
             uint64_t lastseed;
          };
          
-         typedef eosio::singleton <"secretseed"_n,seed> secretseed;
+         typedef eosio::singleton <"rseed"_n,seed> rseed;
+         
 
          void sub_balance( name owner, asset value );
          void add_balance( name owner, asset value, name ram_payer );
          
          void send_notify(name to, string memo);
-         
-         void send_action(name action_name, name participant, asset quantity, string memo);
          
          void set_deferred_tx(name action_name, uint64_t delay_sec, uint8_t play, uint64_t initseed);
          
@@ -304,6 +306,10 @@ namespace eosio {
          void closelotto(uint8_t play, uint64_t initseed,
               uint8_t maxball, uint8_t maxroll, uint8_t percent_of_prizepool[], uint64_t min_jackpot_prize,
               name lotto, string message, name open_action, uint16_t closeopentime);
+              
+         void cashierpay( name to, asset quantity, string memo);
+         
+         void send_settle(name to, asset payback, string memo);              
          
          uint64_t seconds_before_midnight(uint16_t seconds) {
            return (rint(now()/86400)+1)*86400-seconds;
@@ -350,20 +356,20 @@ namespace eosio {
            return result;
          }
          
-         //singletone setter/getter for last session seed
+         //singletone setter/getter for random seed
          uint64_t get_lastseed() {
-           secretseed savedseed(_self,_self.value);
+           rseed savedseed(_self,_self.value);
            auto result = savedseed.get_or_create(_self, seed{now()});
            
 #if !MAINNET
-    eosio::print("last session seed:",result.lastseed);
+    eosio::print("lastseed:",result.lastseed);
 #endif              
            
            return result.lastseed;
          }
          
          void set_nextseed( uint64_t lastseed ) {
-           secretseed savedseed(_self, _self.value);
+           rseed savedseed(_self, _self.value);
            savedseed.set(seed{lastseed}, _self);
          }
    };
