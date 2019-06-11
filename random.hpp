@@ -67,7 +67,7 @@ public:
     }
     
     uint64_t getseed() {
-      return (seed>>2);
+      return (seed>>8);
     }
     
     uint32_t rand(uint32_t to) { //generate random 1 - to
