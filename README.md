@@ -12,7 +12,7 @@ Value sharing is come from percentage of surplus or deficit in each game session
 
 Koin DApp   -   Founder
 
-visit us: koin4dapp.appspot.com
+visit us: <a href="https://koin4dapp.appspot.com"> koin4dapp</a>
 
 <h1>3 Seeds Random Number Generator (3SRNG)</h1>
 Our decentralized random number generators(DRNG) bring fairness and tamper-resistance in the process of generating numbers to ensure fair game to all members. To Ensure the fairness our DRNG using 3 random number seeds. The first seed is from previous session seed saved at our DApp, the second seed is generated from current transaction ID, and the third seed is currently executing transaction block number. So there are no Founder intervention, and all is happened automatically at the blockchain based on DApp algorithm. The code snippet:
