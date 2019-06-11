@@ -202,7 +202,7 @@ xhr.addEventListener("readystatechange", function () {
   }
 });
 
-xhr.open("POST", "https://api.bossweden.org/v1/chain/get_info");
+xhr.open("POST", "https://endpoint/v1/chain/get_info");
 xhr.setRequestHeader("accept", "application/json");
 xhr.setRequestHeader("content-type", "application/json");
 
@@ -220,7 +220,7 @@ Where ref_block_num = last_irreversible_block_num, ref_block_prefix = head_block
   "last_irreversible_block_id": "017668a79c7f887b45b59fca389cbcb14f3f7afb0fa5d09ac4ac1a1b91b13e83",
   "head_block_id": "017669f10670ff45e9a99212f7e2cb090c418d00eea41fecfe4fd37318484c2a",
   "head_block_time": "2019-06-08T13:45:44.500",
-  "head_block_producer": "bosswedenorg",
+  "head_block_producer": "producer",
   "virtual_block_cpu_limit": 200000000,
   "virtual_block_net_limit": 1048576000,
   "block_cpu_limit": 199900,
@@ -229,7 +229,7 @@ Where ref_block_num = last_irreversible_block_num, ref_block_prefix = head_block
 }
 ```
 
-To attack tapos_block_prefix() and tapos_block_num(), attacker must make sure that their smart contract and transaction initialize to our DAPP are run on the same block, otherwise the two numbers will be changed and the result is different. The code snipped to get tapos_block_prefix() and tapos_block_num(), then initialize action to our DAPP. The code snipped is:
+To attack tapos_block_prefix() and tapos_block_num(), attacker must make sure that their smart contract and transaction initialize to our DAPP are run on the same block, otherwise the two numbers will be changed and the result is different. The code snipped to get tapos_block_prefix() and tapos_block_num(), then initialize action to our DAPP to make sure they run on the same block. The code snipped is:
 
 ```
 auto seed2 = tapos_block_prefix() * tapos_block_num();
@@ -285,4 +285,4 @@ void token::smartprofit( asset value)
 ```
 
 <h3>Conclusion</h3>
-So far, we can make conclusion that our 3SDRNG and process in our DApp are secure and ensure fairness to all members. If there are possible to attack our DApp, but they are hard to do in the smart contract. Attacker must initial packed_trx similar to in memory packed_trx and must make sure that they run on the same block.
+So far, we can make conclusion that our 3SDRNG and process in our DApp are secure and ensure fairness to all members. If there are possible to attack our DApp, but they are hard to do in the smart contract. Attacker must initial packed_trx similar to current running transaction in memory packed_trx and must make sure that they run on the same block.
