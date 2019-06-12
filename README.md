@@ -141,7 +141,7 @@ auto seed1 = db.get();
 ...
 ```
 
-To attack transaction Id, at first we must understand how eosio generate transaction ID. Transaction ID is generated using hash  of current packed_trx in memory. The code snipped to print transaction ID in a smart contract is:
+To attack transaction Id, at first we must understand how eosio generate transaction ID. The transaction ID is generated using a hash of current packed_trx in memory. The code snipped to get transaction ID in a smart contract is:
 
 ```
 auto s = read_transaction(nullptr,0);
@@ -243,7 +243,7 @@ It is impossible to create a pure secret random number if we must revealed all o
 
 In eosio we can run series of actions as a transaction, and if one the action issue a rollback, then all executed action in the transaction will rollback. To prevent this behaviour we put parts of our code as deffered action (delayed > 0.5 seconds) which is run at separate transaction and not effected by the rollback.
 
-All smart contract suffered from decompiler approach, and currently no way out.
+All smart contracts suffered from Decompiler approach, and currently no way out.
 
 <h1>Conclusion</h1>
-So far, we can make conclusion that our DApp are secure and we ensure fairness to all members. If there are possible to attack our DApp it is hard to do, even though they can try decompiler our smart contract wasm.
+So far, we can make a conclusion that our DApp are secure and we ensure fairness to all members. If there are possible to attack our DApp, it is hard to do, even though they can try to Decompiler our smart contract wasm raw code.
