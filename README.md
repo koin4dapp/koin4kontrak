@@ -215,6 +215,7 @@ void token::smartprofit( asset value)
 ```
 <h1>Decompiler Issue</h1>
 Smart contract wasm code can be download using /v1/chain/get_raw_code_and_abi RPC Api call.
+
 ```
 <html>
 <script>
@@ -236,6 +237,7 @@ xhr.send(data);
 </script>
 </html>
 ```
+
 Then the wasm raw code can be decompiler from bytecode to opcode using decompiler tools. Online decompiler available online at https://wasdk.github.io/wasmcodeexplorer/.
 
 <h1>Attack Prevention</h1>
