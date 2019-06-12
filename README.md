@@ -15,7 +15,7 @@ Koin DApp   -   Founder
 visit us: <a href="https://koin4dapp.appspot.com"> koin4dapp</a>
 
 <h1>3 Seeds Random Number Generator (3SRNG)</h1>
-Our decentralized random number generators(DRNG) bring fairness and tamper-resistance in the process of generating numbers to ensure fair game to all members. To Ensure the fairness our DRNG using 3 random number seeds. The first seed is from previous session seed saved at our DApp, the second seed is generated from current transaction ID, and the third seed is currently executing transaction block number. So there are no Founder intervention, and all is happened automatically at the blockchain based on DApp algorithm. The code snippet:
+Our decentralized random number generators(DRNG) bring fairness and tamper-resistance in the process of generating numbers to ensure fair game to all members. To Ensure the fairness our DRNG using 3 random number seeds. The first seed is from previous session seed saved at our DApp + secret formula, the second seed is generated from current transaction ID, and the third seed is currently executing transaction block number. So there are no Founder intervention, and all is happened automatically at the blockchain based on DApp algorithm. The code snippet:
 
 ```
 void init(uint64_t initseed) { //first seed=previous session seed saved at DApp + secret formula
@@ -124,8 +124,8 @@ uint32_t rand(uint32_t to) { //generate random 1 - to range
 }
 ```
 
-<h3>Possibility of 3SDRNG Attack</h3>
-KOIN token is player to player community DApp, so that we must make sure that is secure from the attacker which can cause loss to all KOIN token holder, but because the execution of a smart contract in blockchain must be deterministic to keep the consensus, the attackers can take benefit from this behaviour, they can create a smart contract that call our smart contract as an action, so they run in a same block and share the same deterministic parameter values like transaction ID, tapos_block_prefix() and tapos_block_num().
+<h3>Possibility of result Attack</h3>
+KOIN token is player to player community DApp, so that we must make sure that is secure from the attacker which can cause loss to all KOIN token holder, but because the execution of a smart contract in blockchain must be deterministic to keep the consensus, the attackers can take benefit from this behaviour.
 
 To attack our last session seed, attacker would typically create a struct and typedef similar to our singleton table and read it using the same code and scope as our DApp. The code snipped to read value from a table that are not added to the ABI file is:
 
@@ -153,7 +153,7 @@ sha256(tx,s, &result);
 printhex(&result, sizeof(result)); //transaction ID
 ```
 
-If a smart contract issue several inline actions (not deffered one), then all of the actions will run as a transaction, so they share the same parameter values. The code snipped is:
+If a smart contract issue several inline actions (not deffered one), then all of the action will run as a transaction, so they share the same parameter values. The code snipped is:
 
 ```
 auto s = read_transaction(nullptr,0);
@@ -175,7 +175,7 @@ action(
 ```
 
 <h1>Possibility of Rollback Attack</h1>
-In our DApp process we have to make sure avoiding Rollback Attack. In rollback attack technique, attacker can make a smart contract that compare balance before and after action to play game, then rollback the transaction using eosio_assert if ending balance < begining balance. The code snipped is:
+In our DApp process, we have to make sure avoiding Rollback Attack. In rollback attack technique, the attacker can make a smart contract to compare balance before and after action to our smart contract, then issue a rollback if ending balance < begining balance. The code snipped is:
 
 ```
 void token::checkbalance(asset bbalance)
@@ -213,10 +213,37 @@ void token::smartprofit( asset value)
   ).send();
 }
 ```
+<h1>Decompiler Issue</h1>
+Smart contract wasm code can be download using /v1/chain/get_raw_code_and_abi RPC Api call.
+```
+<html>
+<script>
+var data = "{\"account_name\":\"targetkontrak\"}";
+
+var xhr = new XMLHttpRequest();
+
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+  }
+});
+
+xhr.open("POST", "https://api.bossweden.org/v1/chain/get_raw_code_and_abi");
+xhr.setRequestHeader("accept", "application/json");
+xhr.setRequestHeader("content-type", "application/json");
+
+xhr.send(data);
+</script>
+</html>
+```
+Then the wasm raw code can be decompiler from bytecode to opcode using decompiler tools. Online decompiler available online at https://wasdk.github.io/wasmcodeexplorer/.
+
 <h1>Attack Prevention</h1>
-It is impossible to create a totally secret random number if we have revealed it as open source , because the execution of smart contracts must be deterministic to keep the consensus. The attacker can duplicate your algorithm and calculate the result and run your smart contract using action, so they run in a same block, and all the parameters are deterministic.
-So we can't open all of our source code, we 
+It is impossible to create a pure secret random number if we must revealed all our code as open source , because the behaviour of smart contracts must be deterministic to keep the consensus. The attacker can duplicate our code, try to calculate the result and transfer it to our smart contract via action call. To overcome this we have kept part of our code close source as secret formula.
 
+In eosio we can run series of actions as a transaction, and if one the action issue a rollback, then all executed action in the transaction will rollback. To prevent this behaviour we put parts of our code as deffered action (delayed > 0.5 seconds) which is run at separate transaction and not effected by the rollback.
 
-<h3>Conclusion</h3>
-So far, we can make conclusion that our 3SDRNG and process in our DApp are secure and we ensure fairness to all members. If there are possible to attack our DApp,
+All smart contract suffered from decompiler approach, and currently no way out.
+
+<h1>Conclusion</h1>
+So far, we can make conclusion that our DApp are secure and we ensure fairness to all members. If there are possible to attack our DApp it is hard to do, even though they can try decompiler our smart contract wasm.
