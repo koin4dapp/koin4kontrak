@@ -124,7 +124,7 @@ uint32_t rand(uint32_t to) { //generate random 1 - to range
 }
 ```
 
-<h3>Possibility of result Attack</h3>
+<h3>Possibility of Parameters Attack</h3>
 KOIN token is player to player community DApp, so that we must make sure that is secure from the attacker which can cause loss to all KOIN token holder, but because the execution of a smart contract in blockchain must be deterministic to keep the consensus, the attackers can take benefit from this behaviour.
 
 To attack our last session seed, attacker would typically create a struct and typedef similar to our singleton table and read it using the same code and scope as our DApp. The code snipped to read value from a table that are not added to the ABI file is:
