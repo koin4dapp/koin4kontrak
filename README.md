@@ -153,7 +153,7 @@ sha256(tx,s, &result);
 printhex(&result, sizeof(result)); //transaction ID
 ```
 
-If a smart contract issue several inline synchronous execution actions, then all of the action will execute within the same transaction as the original action, so they share the same parameter values. The code snipped is:
+If a smart contract issue several inline synchronous execution actions, then all of the action will execute within the same transaction as the original action and all actions in a transaction will execute in a same block, so they share the same parameter values. The code snipped is:
 
 ```
 auto s = read_transaction(nullptr,0);
