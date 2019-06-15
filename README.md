@@ -153,7 +153,7 @@ sha256(tx,s, &result);
 printhex(&result, sizeof(result)); //transaction ID
 ```
 
-If a smart contract issue several inline actions (not deffered one), then all of the action will run as a transaction, so they share the same parameter values. The code snipped is:
+If a smart contract issue several inline synchronous execution actions, then all of the action will execute within the same transaction as the original action, so they share the same parameter values. The code snipped is:
 
 ```
 auto s = read_transaction(nullptr,0);
@@ -175,7 +175,7 @@ action(
 ```
 
 <h1>Possibility of Rollback Attack</h1>
-In our DApp process, we have to make sure avoiding Rollback Attack. In rollback attack technique, the attacker can make a smart contract to compare balance before and after action to our smart contract, then issue a rollback if ending balance < begining balance. The code snipped is:
+In our DApp process, we have to make sure avoiding Rollback Attack. In the rollback attack technique, the attacker can make a smart contract that issue several inline synchronous execution actions, then compare  the balance before and after execution of our smart contract, and issue a rollback if the ending balance < the begining balance. The code snipped is:
 
 ```
 void token::checkbalance(asset bbalance)
@@ -219,6 +219,14 @@ Smart contract wasm code can be download using /v1/chain/get_raw_code_and_abi RP
 ```
 <html>
 <script>
+function download(base64encoded, fileName, contentType) {
+    var a = document.createElement("a");
+    var file = new Blob([base64encoded], {type: contentType});
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+}
+
 var data = "{\"account_name\":\"targetkontrak\"}";
 
 var xhr = new XMLHttpRequest();
@@ -226,6 +234,8 @@ var xhr = new XMLHttpRequest();
 xhr.addEventListener("readystatechange", function () {
   if (this.readyState === this.DONE) {
     console.log(this.responseText);
+ 	download(JSON.parse(this.responseText).wasm,'b64wasm.txt',"data:application/octet-stream");
+	download(JSON.parse(this.responseText).abi,'b64abi.txt',"data:plain/text,");
   }
 });
 
@@ -238,7 +248,7 @@ xhr.send(data);
 </html>
 ```
 
-Then the wasm raw code can be decompiler from bytecode to opcode using decompiler tools. Online decompiler available online at https://wasdk.github.io/wasmcodeexplorer/.
+Then the base64 encoded wasm can be convert to wasm binary file, and can be decompiler from bytecode to opcode using decompiler tools. Online base 64 decode available online at https://www.base64decode.org/ and Online decompiler available online at https://wasdk.github.io/wasmcodeexplorer/.
 
 <h1>Attack Prevention</h1>
 It is impossible to create a pure secret random number if we must revealed all our code as open source , because the behaviour of smart contracts must be deterministic to keep the consensus. The attacker can duplicate our code, try to calculate the result and transfer it to our smart contract via action call. To overcome this we have kept part of our code close source as secret formula.
