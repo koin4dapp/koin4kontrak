@@ -1,0 +1,29 @@
+<html>
+<script>
+function download(base64encoded, fileName, contentType) {
+    var a = document.createElement("a");
+    var file = new Blob([base64encoded], {type: contentType});
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+}
+
+var data = "{\"account_name\":\"targetkontrak\"}";
+
+var xhr = new XMLHttpRequest();
+
+xhr.addEventListener("readystatechange", function () {
+  if (this.readyState === this.DONE) {
+    console.log(this.responseText);
+ 	download(JSON.parse(this.responseText).wasm,'b64wasm.txt',"data:application/octet-stream");
+	download(JSON.parse(this.responseText).abi,'b64abi.txt',"data:plain/text,");
+  }
+});
+
+xhr.open("POST", "https://api.bossweden.org/v1/chain/get_raw_code_and_abi");
+xhr.setRequestHeader("accept", "application/json");
+xhr.setRequestHeader("content-type", "application/json");
+
+xhr.send(data);
+</script>
+</html>
