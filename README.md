@@ -1,5 +1,5 @@
-<h1>Player to Player Community Token</h1>
-KOIN is DApp run on EOS block-chain to facilitate Player to Player interaction.
+<h1>Bettors Community Token</h1>
+KOIN is DApp run on EOS block-chain to facilitate Bettors interaction.
 
 <h2>True Value Offering & Better than Any Offering</h2>
 This is not an ICO activity, but an opportunity sharing offering. Members and Founder share the same value result, no free token distribute to Founder, all KOIN hold by founder came from his own fund and convert with same rate as other member.
@@ -15,7 +15,7 @@ Koin DApp   -   Founder
 visit us: <a href="https://koin4dapp.appspot.com"> koin4dapp</a>
 
 <h1>3 Seeds Random Number Generator (3SRNG)</h1>
-Our decentralized random number generators(DRNG) bring fairness and tamper-resistance in the process of generating numbers to ensure fair game to all members. To Ensure the fairness our DRNG using 3 random number seeds. The first seed is from previous session seed saved at our DApp + secret formula, the second seed is generated from current transaction ID, and the third seed is currently executing transaction block number. So there are no Founder intervention, and all is happened automatically at the blockchain based on DApp algorithm. The code snippet:
+Our decentralized random number generators(DRNG) bring fairness and tamper-resistance in the process of generating numbers to ensure fair game to all bettors. To Ensure the fairness our DRNG using 3 random number seeds. The first seed is from previous session seed saved at our DApp + secret formula, the second seed is generated from current transaction ID, and the third seed is currently executing transaction block number. So there are no Founder intervention, and all is happened automatically at the blockchain based on DApp algorithm. The code snippet:
 
 ```
 void init(uint64_t initseed) { //first seed=previous session seed saved at DApp + secret formula
@@ -258,4 +258,4 @@ In eosio we can run series of actions as a transaction, and if one the action is
 All smart contracts suffered from Decompiler approach, and currently no way out.
 
 <h1>Conclusion</h1>
-So far, we can make a conclusion that our DApp are secure and we ensure fairness to all members. If there are possible to attack our DApp, it is hard to do, even though they can try to Decompiler our smart contract wasm raw code.
+So far, we can make a conclusion that our DApp are secure and we ensure fairness to all bettors. If there are possible to attack our DApp, it is hard to do, even though they can try to Decompiler our smart contract wasm raw code.
