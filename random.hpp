@@ -144,18 +144,18 @@ public:
       return result;
     }
     
-    //expected value = 1x20+2x10+3x6+4x5+10x2=20+20+18+20+20=98
-    int wheelcarlo(uint32_t rnd_1_100) {
-        if (rnd_1_100 < 81)
+    //expected value = 980
+    int wheelcarlo(uint32_t rnd_1_1000) {
+        if (rnd_1_1000 < 539)
           return 0;      
-        if (rnd_1_100 < 90)
-          return 2;   //10x2=20
-        if (rnd_1_100 < 94)
-          return 5;   //4x5=20
-        if (rnd_1_100 < 97)
-          return 6;   //3x6=18
-        if (rnd_1_100 < 99)
-          return 10;  //2x10=20
-        return 20;    //1x20=20
+        if (rnd_1_1000 < 990)
+          return 2;
+        if (rnd_1_1000 < 994)
+          return 5;
+        if (rnd_1_1000 < 997)
+          return 6;
+        if (rnd_1_1000 < 999)
+          return 10;
+        return 20;
     }
 };
