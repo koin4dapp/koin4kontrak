@@ -146,15 +146,15 @@ public:
     
     //expected value = 980
     int wheelcarlo(uint32_t rnd_1_1000) {
-        if (rnd_1_1000 < 539)
+        if (rnd_1_1000 < 605)
           return 0;      
-        if (rnd_1_1000 < 990)
+        if (rnd_1_1000 < 974)
           return 2;
-        if (rnd_1_1000 < 994)
+        if (rnd_1_1000 < 982)
           return 5;
-        if (rnd_1_1000 < 997)
+        if (rnd_1_1000 < 989)
           return 6;
-        if (rnd_1_1000 < 999)
+        if (rnd_1_1000 < 995)
           return 10;
         return 20;
     }
